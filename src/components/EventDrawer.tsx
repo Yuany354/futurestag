@@ -1,7 +1,7 @@
 import React from 'react';
 import { MacroEvent } from '../types';
 import { EventForm } from './EventForm';
-import { Eye, Save, Check, X, SlidersHorizontal } from 'lucide-react';
+import { Eye, Save, Check, X, SlidersHorizontal, Trash2 } from 'lucide-react';
 
 interface EventDrawerProps {
   isOpen: boolean;
@@ -14,6 +14,7 @@ interface EventDrawerProps {
   onOpenAddVariety: () => void;
   onSaveConfig: () => void;
   onPreview: () => void;
+  onRequestDelete?: (id: string, title: string) => void;
   isSavedJustNow: boolean;
 }
 
@@ -28,6 +29,7 @@ export const EventDrawer: React.FC<EventDrawerProps> = ({
   onOpenAddVariety,
   onSaveConfig,
   onPreview,
+  onRequestDelete,
   isSavedJustNow,
 }) => {
   if (!isOpen) return null;
@@ -66,6 +68,17 @@ export const EventDrawer: React.FC<EventDrawerProps> = ({
 
           {/* Action Buttons in Drawer Header */}
           <div className="flex items-center gap-2.5 shrink-0">
+            {onRequestDelete && (
+              <button
+                onClick={() => onRequestDelete(event.id, event.title)}
+                className="px-3 py-1.5 text-rose-600 hover:text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200 text-xs font-semibold rounded-lg transition-colors flex items-center gap-1.5 cursor-pointer"
+                title="删除此事件"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+                <span>删除</span>
+              </button>
+            )}
+
             <button
               onClick={onPreview}
               className="px-3.5 py-1.5 border border-gray-300 text-xs font-semibold rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-1.5 bg-white text-gray-700 cursor-pointer"

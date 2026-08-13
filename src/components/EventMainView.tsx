@@ -1,7 +1,7 @@
 import React from 'react';
 import { MacroEvent } from '../types';
 import { getIndustryColor, INDUSTRY_COLOR_BADGES } from '../utils/industryColors';
-import { Search, Plus, Download, Calendar, Eye, Edit3, Sparkles, Filter, ChevronRight, Check } from 'lucide-react';
+import { Search, Plus, Download, Calendar, Eye, Edit3, Sparkles, Filter, ChevronRight, Check, Trash2 } from 'lucide-react';
 
 interface EventMainViewProps {
   events: MacroEvent[];
@@ -10,6 +10,7 @@ interface EventMainViewProps {
   onAddNewEvent: () => void;
   onExportExcel: () => void;
   onPreviewEvent: (evt: MacroEvent) => void;
+  onRequestDelete: (id: string, title: string) => void;
   searchQuery: string;
   onSearchChange: (q: string) => void;
   selectedCategoryFilter: string | null;
@@ -24,6 +25,7 @@ export const EventMainView: React.FC<EventMainViewProps> = ({
   onAddNewEvent,
   onExportExcel,
   onPreviewEvent,
+  onRequestDelete,
   searchQuery,
   onSearchChange,
   selectedCategoryFilter,
@@ -265,6 +267,19 @@ export const EventMainView: React.FC<EventMainViewProps> = ({
                             >
                               <Edit3 className="w-3.5 h-3.5" />
                               <span>编辑</span>
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                onRequestDelete(evt.id, evt.title);
+                              }}
+                              className="px-2 py-1 text-rose-600 hover:text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200 rounded text-xs transition-colors flex items-center gap-1 cursor-pointer"
+                              title="删除此事件"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                              <span>删除</span>
                             </button>
                           </div>
                         </td>

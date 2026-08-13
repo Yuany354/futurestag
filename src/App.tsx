@@ -9,6 +9,7 @@ import { PreviewModal } from './components/PreviewModal';
 import { AddCategoryModal } from './components/AddCategoryModal';
 import { AddIndustryModal } from './components/AddIndustryModal';
 import { AddVarietyModal } from './components/AddVarietyModal';
+import { ConfirmDeleteModal } from './components/ConfirmDeleteModal';
 import { exportEventsToExcel } from './utils/excelExport';
 import { Check, ShieldAlert, Database, BarChart3, ArrowRight, Zap, FileText, Calendar } from 'lucide-react';
 
@@ -57,6 +58,7 @@ export default function App() {
   const [isAddVarietyOpen, setIsAddVarietyOpen] = useState(false);
   const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
   const [previewEvent, setPreviewEvent] = useState<MacroEvent | null>(null);
+  const [deletingTarget, setDeletingTarget] = useState<{ id: string; title: string } | null>(null);
 
   // Toast State
   const [isSavedJustNow, setIsSavedJustNow] = useState(false);
@@ -203,6 +205,30 @@ export default function App() {
     setIsPreviewModalOpen(true);
   };
 
+  // Delete Event Action
+  const handleConfirmDelete = () => {
+    if (!deletingTarget) return;
+    const { id, title } = deletingTarget;
+    const updatedEvents = events.filter((e) => e.id !== id);
+    setEvents(updatedEvents);
+    localStorage.setItem('ycm_macro_events', JSON.stringify(updatedEvents));
+
+    if (activeEventId === id) {
+      if (updatedEvents.length > 0) {
+        setActiveEventId(updatedEvents[0].id);
+      } else {
+        setActiveEventId('');
+      }
+      setIsDrawerOpen(false);
+    }
+
+    setDeletingTarget(null);
+    setToastText(`已成功删除“${title}”`);
+    setTimeout(() => {
+      setToastText(null);
+    }, 2500);
+  };
+
   return (
     <div className="flex flex-col h-screen w-full bg-[#F8FAFC] text-[#111827] font-sans overflow-hidden">
       {/* Platform Header with Top Navigation Menu */}
@@ -230,6 +256,7 @@ export default function App() {
                 onAddNewEvent={handleAddNewEvent}
                 onExportExcel={handleExportExcel}
                 onPreviewEvent={handlePreviewEvent}
+                onRequestDelete={(id, title) => setDeletingTarget({ id, title })}
                 searchQuery={searchQuery}
                 onSearchChange={setSearchQuery}
                 selectedCategoryFilter={selectedCategoryFilter}
@@ -295,6 +322,7 @@ export default function App() {
             onOpenAddVariety={() => setIsAddVarietyOpen(true)}
             onSaveConfig={handleSaveConfig}
             onPreview={() => handlePreviewEvent(activeEvent)}
+            onRequestDelete={(id, title) => setDeletingTarget({ id, title })}
             isSavedJustNow={isSavedJustNow}
           />
         )}
@@ -309,6 +337,13 @@ export default function App() {
       )}
 
       {/* Dialog Modals */}
+      <ConfirmDeleteModal
+        isOpen={Boolean(deletingTarget)}
+        title={deletingTarget?.title || ''}
+        onConfirm={handleConfirmDelete}
+        onCancel={() => setDeletingTarget(null)}
+      />
+
       <AddCategoryModal
         isOpen={isAddCategoryOpen}
         onClose={() => setIsAddCategoryOpen(false)}
