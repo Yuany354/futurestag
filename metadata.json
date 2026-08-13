@@ -1,0 +1,6 @@
+{
+  "name": "事件字段管理系统",
+  "description": "High-density event field management and research platform for defining macro market events, impacted industries, and financial asset varieties.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
