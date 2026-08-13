@@ -133,141 +133,147 @@ export const EventMainView: React.FC<EventMainViewProps> = ({
         </div>
       </div>
 
-      {/* Events List / Grid Area */}
-      <div className="flex-1 overflow-y-auto p-6 md:p-8 space-y-4">
+      {/* Events Table Area */}
+      <div className="flex-1 overflow-y-auto p-6 md:p-8">
         {filteredEvents.length === 0 ? (
           <div className="p-12 text-center bg-white rounded-xl border border-dashed border-slate-300">
             <Sparkles className="w-8 h-8 text-slate-300 mx-auto mb-2" />
-            <p className="text-sm font-semibold text-slate-700">未找到匹配的重大事件定义</p>
+            <p className="text-sm font-semibold text-slate-700">未找到匹配的重大事件</p>
             <p className="text-xs text-slate-400 mt-1">请尝试调整搜索关键词或选择其他事件分类</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            {filteredEvents.map((evt) => {
-              const isActive = evt.id === activeEventId;
+          <div className="bg-white rounded-xl border border-slate-200 shadow-2xs overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="bg-slate-50/80 border-b border-slate-200 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                    <th className="py-3.5 px-4 font-bold">事件名称 & 分类</th>
+                    <th className="py-3.5 px-4 font-bold w-32 whitespace-nowrap">起始日期</th>
+                    <th className="py-3.5 px-4 font-bold">受影响产业</th>
+                    <th className="py-3.5 px-4 font-bold">核心交易品种</th>
+                    <th className="py-3.5 px-4 font-bold max-w-xs">事件简述</th>
+                    <th className="py-3.5 px-4 font-bold text-right w-44 whitespace-nowrap">操作</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100 text-xs text-slate-700">
+                  {filteredEvents.map((evt) => {
+                    const isActive = evt.id === activeEventId;
 
-              return (
-                <div
-                  key={evt.id}
-                  onClick={() => onSelectEvent(evt.id, true)}
-                  className={`p-5 bg-white rounded-xl border transition-all cursor-pointer group flex flex-col justify-between hover:shadow-md ${
-                    isActive
-                      ? 'border-indigo-500 ring-2 ring-indigo-500/20 shadow-xs'
-                      : 'border-slate-200 hover:border-slate-300'
-                  }`}
-                >
-                  <div>
-                    {/* Categories & Start Date Row */}
-                    <div className="flex items-center justify-between gap-2 mb-2">
-                      <div className="flex flex-wrap gap-1.5">
-                        {evt.categories.map((cat) => (
-                          <span
-                            key={cat}
-                            className="px-2 py-0.5 bg-indigo-50/80 text-indigo-700 border border-indigo-200/60 text-[10px] font-bold rounded"
-                          >
-                            {cat}
-                          </span>
-                        ))}
-                      </div>
-
-                      <div className="flex items-center gap-1 text-[11px] font-mono text-slate-400 shrink-0">
-                        <Calendar className="w-3 h-3 text-slate-400" />
-                        <span>{evt.startDate}</span>
-                      </div>
-                    </div>
-
-                    {/* Title */}
-                    <h3 className="text-sm font-bold text-slate-900 leading-snug group-hover:text-indigo-600 transition-colors mb-2">
-                      {evt.title}
-                    </h3>
-
-                    {/* Description preview */}
-                    <p className="text-xs text-slate-600 line-clamp-2 leading-relaxed mb-4">
-                      {evt.description || '暂无事件描述'}
-                    </p>
-
-                    {/* Impacted Industries */}
-                    <div className="space-y-2 mb-3">
-                      <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                        受影响产业板块
-                      </div>
-                      <div className="flex flex-wrap gap-1.5">
-                        {evt.impactedIndustries.length === 0 ? (
-                          <span className="text-xs text-slate-400 italic">暂无产业</span>
-                        ) : (
-                          evt.impactedIndustries.map((ind) => {
-                            const colorStyle = getIndustryColor(ind.name, ind.colorStyle);
-                            const badgeClass = INDUSTRY_COLOR_BADGES[colorStyle];
-                            return (
+                    return (
+                      <tr
+                        key={evt.id}
+                        onClick={() => onSelectEvent(evt.id, true)}
+                        className={`transition-colors cursor-pointer group hover:bg-slate-50/80 ${
+                          isActive ? 'bg-indigo-50/40 font-medium' : ''
+                        }`}
+                      >
+                        {/* Title & Categories */}
+                        <td className="py-3.5 px-4 align-top">
+                          <div className="font-bold text-slate-900 group-hover:text-indigo-600 transition-colors mb-1">
+                            {evt.title}
+                          </div>
+                          <div className="flex flex-wrap gap-1">
+                            {evt.categories.map((cat) => (
                               <span
-                                key={ind.id}
-                                className={`px-2 py-0.5 text-[11px] font-semibold border rounded ${badgeClass}`}
+                                key={cat}
+                                className="px-1.5 py-0.5 bg-indigo-50 text-indigo-700 border border-indigo-200/60 text-[10px] font-bold rounded"
                               >
-                                {ind.name}
+                                {cat}
                               </span>
-                            );
-                          })
-                        )}
-                      </div>
-                    </div>
+                            ))}
+                          </div>
+                        </td>
 
-                    {/* Market Varieties */}
-                    <div className="space-y-1.5 mb-4">
-                      <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                        核心交易品种
-                      </div>
-                      <div className="flex flex-wrap gap-1.5">
-                        {evt.marketVarieties.length === 0 ? (
-                          <span className="text-xs text-slate-400 italic">暂无品种</span>
-                        ) : (
-                          evt.marketVarieties.map((v) => (
-                            <span
-                              key={v.code}
-                              className="px-2 py-0.5 bg-slate-100 text-slate-800 border border-slate-200 text-[11px] font-medium rounded flex items-center gap-1"
+                        {/* Start Date */}
+                        <td className="py-3.5 px-4 align-top whitespace-nowrap font-mono text-slate-500">
+                          <div className="flex items-center gap-1">
+                            <Calendar className="w-3.5 h-3.5 text-slate-400" />
+                            <span>{evt.startDate}</span>
+                          </div>
+                        </td>
+
+                        {/* Impacted Industries */}
+                        <td className="py-3.5 px-4 align-top">
+                          <div className="flex flex-wrap gap-1 max-w-xs">
+                            {evt.impactedIndustries.length === 0 ? (
+                              <span className="text-slate-400 italic">暂无</span>
+                            ) : (
+                              evt.impactedIndustries.map((ind) => {
+                                const colorStyle = getIndustryColor(ind.name, ind.colorStyle);
+                                const badgeClass = INDUSTRY_COLOR_BADGES[colorStyle];
+                                return (
+                                  <span
+                                    key={ind.id}
+                                    className={`px-2 py-0.5 text-[10px] font-semibold border rounded ${badgeClass}`}
+                                  >
+                                    {ind.name}
+                                  </span>
+                                );
+                              })
+                            )}
+                          </div>
+                        </td>
+
+                        {/* Market Varieties */}
+                        <td className="py-3.5 px-4 align-top">
+                          <div className="flex flex-wrap gap-1 max-w-xs">
+                            {evt.marketVarieties.length === 0 ? (
+                              <span className="text-slate-400 italic">暂无</span>
+                            ) : (
+                              evt.marketVarieties.map((v) => (
+                                <span
+                                  key={v.code}
+                                  className="px-1.5 py-0.5 bg-slate-100 text-slate-800 border border-slate-200 text-[10px] rounded font-medium inline-flex items-center gap-1"
+                                >
+                                  <span>{v.name}</span>
+                                  <code className="text-slate-500 font-mono text-[9px]">{v.code}</code>
+                                </span>
+                              ))
+                            )}
+                          </div>
+                        </td>
+
+                        {/* Description */}
+                        <td className="py-3.5 px-4 align-top max-w-xs">
+                          <p className="text-slate-600 line-clamp-2 leading-relaxed text-[11px]">
+                            {evt.description || '暂无描述'}
+                          </p>
+                        </td>
+
+                        {/* Actions */}
+                        <td className="py-3.5 px-4 align-top text-right whitespace-nowrap">
+                          <div className="flex items-center justify-end gap-1.5">
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                onPreviewEvent(evt);
+                              }}
+                              className="px-2 py-1 text-slate-600 hover:text-indigo-600 bg-slate-50 hover:bg-indigo-50 border border-slate-200 hover:border-indigo-200 rounded text-xs transition-colors flex items-center gap-1 cursor-pointer"
                             >
-                              <span className="font-bold">{v.name}</span>
-                              <code className="text-slate-500 font-mono text-[10px]">
-                                {v.code}
-                              </code>
-                            </span>
-                          ))
-                        )}
-                      </div>
-                    </div>
-                  </div>
+                              <Eye className="w-3.5 h-3.5" />
+                              <span>预览</span>
+                            </button>
 
-                  {/* Card Bottom Actions Row */}
-                  <div className="pt-3 border-t border-slate-100 flex items-center justify-end text-xs">
-                    <div className="flex items-center gap-2">
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onPreviewEvent(evt);
-                        }}
-                        className="px-2.5 py-1 text-slate-600 hover:text-indigo-600 bg-slate-50 hover:bg-indigo-50 border border-slate-200 hover:border-indigo-200 rounded text-xs transition-colors flex items-center gap-1 cursor-pointer"
-                      >
-                        <Eye className="w-3.5 h-3.5" />
-                        <span>预览卡片</span>
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onSelectEvent(evt.id, true);
-                        }}
-                        className="px-3 py-1 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded text-xs transition-all flex items-center gap-1 shadow-2xs cursor-pointer"
-                      >
-                        <Edit3 className="w-3.5 h-3.5" />
-                        <span>配置编辑</span>
-                        <ChevronRight className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                onSelectEvent(evt.id, true);
+                              }}
+                              className="px-2.5 py-1 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded text-xs transition-all flex items-center gap-1 shadow-2xs cursor-pointer"
+                            >
+                              <Edit3 className="w-3.5 h-3.5" />
+                              <span>编辑</span>
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
           </div>
         )}
       </div>
