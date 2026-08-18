@@ -155,7 +155,7 @@ export const EventMainView: React.FC<EventMainViewProps> = ({
                     <th className="py-3.5 px-4 font-bold">核心交易品种</th>
                     <th className="py-3.5 px-4 font-bold max-w-xs">事件简述</th>
                     <th className="py-3.5 px-4 font-bold text-center w-24">事件烈度</th>
-                    <th className="py-3.5 px-4 font-bold text-center w-24">商品冲击程度</th>
+                    <th className="py-3.5 px-4 font-bold text-center w-28 whitespace-nowrap">商品冲击程度</th>
                     <th className="py-3.5 px-4 font-bold text-right w-44 whitespace-nowrap">操作</th>
                   </tr>
                 </thead>
@@ -247,7 +247,7 @@ export const EventMainView: React.FC<EventMainViewProps> = ({
                         {/* Event Intensity Score */}
                         <td className="py-3.5 px-4 align-middle text-center">
                           {evt.eventIntensity != null ? (
-                            <span className="inline-flex items-center justify-center w-7 h-7 bg-amber-100 text-amber-800 text-xs font-bold rounded-full border border-amber-300">
+                            <span className="inline-flex items-center justify-center w-6 h-6 bg-amber-100 text-amber-800 text-xs font-bold rounded-full border border-amber-300">
                               {evt.eventIntensity}
                             </span>
                           ) : (
@@ -258,7 +258,7 @@ export const EventMainView: React.FC<EventMainViewProps> = ({
                         {/* Commodity Impact Score */}
                         <td className="py-3.5 px-4 align-middle text-center">
                           {evt.commodityImpact != null ? (
-                            <span className="inline-flex items-center justify-center w-7 h-7 bg-rose-100 text-rose-800 text-xs font-bold rounded-full border border-rose-300">
+                            <span className="inline-flex items-center justify-center w-6 h-6 bg-rose-100 text-rose-800 text-xs font-bold rounded-full border border-rose-300">
                               {evt.commodityImpact}
                             </span>
                           ) : (
