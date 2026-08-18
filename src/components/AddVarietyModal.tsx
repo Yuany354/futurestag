@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { MarketVariety } from '../types';
 import { VARIETY_PRESETS } from '../data/mockEvents';
-import { X, Activity, Search } from 'lucide-react';
+import { X, Activity, Search, Plus, Check } from 'lucide-react';
 
 interface AddVarietyModalProps {
   isOpen: boolean;
@@ -19,24 +19,36 @@ export const AddVarietyModal: React.FC<AddVarietyModalProps> = ({
   const [searchTerm, setSearchTerm] = useState('');
   const [customName, setCustomName] = useState('');
   const [customCode, setCustomCode] = useState('');
+  const [selectedPresets, setSelectedPresets] = useState<MarketVariety[]>([]);
 
   if (!isOpen) return null;
 
   const isAdded = (code: string) =>
     existingVarieties.some((v) => v.code.toLowerCase() === code.toLowerCase());
 
+  const isPresetSelected = (code: string) =>
+    selectedPresets.some((p) => p.code.toLowerCase() === code.toLowerCase());
+
   const filteredPresets = VARIETY_PRESETS.filter(
     (p) =>
-      p.name.includes(searchTerm) ||
-      p.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (p.category && p.category.includes(searchTerm))
+      !isAdded(p.code) &&
+      (p.name.includes(searchTerm) ||
+        p.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (p.category && p.category.includes(searchTerm)))
   );
 
-  const handleSelectPreset = (preset: MarketVariety) => {
-    if (!isAdded(preset.code)) {
-      onAdd(preset);
-      onClose();
+  const handleTogglePreset = (preset: MarketVariety) => {
+    if (isPresetSelected(preset.code)) {
+      setSelectedPresets(selectedPresets.filter((p) => p.code !== preset.code));
+    } else {
+      setSelectedPresets([...selectedPresets, preset]);
     }
+  };
+
+  const handleConfirmPresets = () => {
+    onAdd(selectedPresets);
+    setSelectedPresets([]);
+    onClose();
   };
 
   const handleCreateCustom = (e: React.FormEvent) => {
@@ -53,6 +65,13 @@ export const AddVarietyModal: React.FC<AddVarietyModalProps> = ({
     }
   };
 
+  const handleClose = () => {
+    setSelectedPresets([]);
+    setCustomName('');
+    setCustomCode('');
+    onClose();
+  };
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-xs p-4">
       <div className="bg-white rounded-lg border border-gray-200 shadow-xl w-full max-w-lg overflow-hidden animate-in fade-in zoom-in-95 duration-150">
@@ -62,7 +81,7 @@ export const AddVarietyModal: React.FC<AddVarietyModalProps> = ({
             <h3 className="text-sm font-bold text-gray-900">选择或配置影响品种</h3>
           </div>
           <button
-            onClick={onClose}
+            onClick={handleClose}
             className="text-gray-400 hover:text-gray-600 p-1 rounded hover:bg-gray-100"
           >
             <X className="w-4 h-4" />
@@ -85,15 +104,18 @@ export const AddVarietyModal: React.FC<AddVarietyModalProps> = ({
 
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
               {filteredPresets.map((p) => {
-                const added = isAdded(p.code);
+                const selected = isPresetSelected(p.code);
+                const alreadyAdded = isAdded(p.code);
                 return (
                   <button
                     key={p.code}
                     type="button"
-                    disabled={added}
-                    onClick={() => handleSelectPreset(p)}
+                    disabled={alreadyAdded}
+                    onClick={() => handleTogglePreset(p)}
                     className={`flex items-center justify-between p-2 rounded border text-left transition-all ${
-                      added
+                      selected
+                        ? 'bg-indigo-100 border-indigo-400 text-indigo-900'
+                        : alreadyAdded
                         ? 'bg-gray-50 border-gray-200 text-gray-400 cursor-not-allowed'
                         : 'bg-white border-gray-200 hover:border-indigo-500 hover:bg-indigo-50/50'
                     }`}
@@ -102,9 +124,14 @@ export const AddVarietyModal: React.FC<AddVarietyModalProps> = ({
                       <div className="text-xs font-bold text-gray-800">{p.name}</div>
                       {p.category && <div className="text-[10px] text-gray-400">{p.category}</div>}
                     </div>
-                    <code className="text-[11px] font-mono font-bold bg-gray-100 text-gray-700 px-1 py-0.5 rounded border border-gray-200">
-                      {p.code}
-                    </code>
+                    <div className="flex items-center gap-1">
+                      <code className="text-[11px] font-mono font-bold bg-gray-100 text-gray-700 px-1 py-0.5 rounded border border-gray-200">
+                        {p.code}
+                      </code>
+                      {selected && (
+                        <Check className="w-3.5 h-3.5 text-indigo-600 font-bold shrink-0" />
+                      )}
+                    </div>
                   </button>
                 );
               })}
@@ -136,18 +163,29 @@ export const AddVarietyModal: React.FC<AddVarietyModalProps> = ({
             <div className="flex justify-end gap-2 pt-2">
               <button
                 type="button"
-                onClick={onClose}
+                onClick={handleClose}
                 className="px-3 py-1.5 border border-gray-300 text-xs text-gray-700 font-medium rounded hover:bg-gray-50"
               >
                 取消
               </button>
-              <button
-                type="submit"
-                disabled={!customName.trim() || !customCode.trim()}
-                className="px-4 py-1.5 bg-indigo-600 text-white text-xs font-medium rounded hover:bg-indigo-700 disabled:opacity-50"
-              >
-                添加品种
-              </button>
+              {selectedPresets.length > 0 ? (
+                <button
+                  type="button"
+                  onClick={handleConfirmPresets}
+                  className="px-4 py-1.5 bg-indigo-600 text-white text-xs font-bold rounded hover:bg-indigo-700 flex items-center gap-1"
+                >
+                  <Check className="w-3.5 h-3.5" />
+                  添加品种（{selectedPresets.length}）
+                </button>
+              ) : (
+                <button
+                  type="submit"
+                  disabled={!customName.trim() || !customCode.trim()}
+                  className="px-4 py-1.5 bg-indigo-600 text-white text-xs font-medium rounded hover:bg-indigo-700 disabled:opacity-50"
+                >
+                  添加品种
+                </button>
+              )}
             </div>
           </form>
         </div>

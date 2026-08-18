@@ -134,12 +134,13 @@ export default function App() {
     }
   };
 
-  // Add market variety
-  const handleAddVariety = (variety: MarketVariety) => {
+  // Add market varieties (supports batch add)
+  const handleAddVariety = (varieties: MarketVariety | MarketVariety[]) => {
     if (activeEvent) {
+      const toAdd = Array.isArray(varieties) ? varieties : [varieties];
       handleUpdateActiveEvent({
         ...activeEvent,
-        marketVarieties: [...activeEvent.marketVarieties, variety],
+        marketVarieties: [...activeEvent.marketVarieties, ...toAdd],
       });
     }
   };
