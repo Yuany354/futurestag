@@ -261,10 +261,58 @@ export const EventForm: React.FC<EventFormProps> = ({
           </div>
         </div>
 
-        {/* 7. 备注 */}
+        {/* 7. 事件烈度 */}
         <div className="col-span-12 border-t border-gray-200 pt-6 mt-2">
           <label className="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1.5">
-            7. 备注
+            7. 事件烈度
+          </label>
+          <select
+            value={event.eventIntensity ?? ''}
+            onChange={(e) =>
+              onChange({
+                ...event,
+                eventIntensity: e.target.value ? Number(e.target.value) : undefined,
+              })
+            }
+            className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-md text-sm text-gray-900 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none cursor-pointer max-w-xs"
+          >
+            <option value="">请选择（1～5）</option>
+            {[1, 2, 3, 4, 5].map((n) => (
+              <option key={n} value={n}>
+                {n}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* 8. 商品冲击程度 */}
+        <div className="col-span-12">
+          <label className="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1.5">
+            8. 商品冲击程度
+          </label>
+          <select
+            value={event.commodityImpact ?? ''}
+            onChange={(e) =>
+              onChange({
+                ...event,
+                commodityImpact: e.target.value ? Number(e.target.value) : undefined,
+              })
+            }
+            className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-md text-sm text-gray-900 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none cursor-pointer max-w-xs"
+          >
+            <option value="">请选择（1～5）</option>
+            {[1, 2, 3, 4, 5].map((n) => (
+              <option key={n} value={n}>
+                {n}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* 9. 备注 */}
+        <div className="col-span-12 border-t border-gray-200 pt-6 mt-2">
+          <label className="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1.5">
+            9. 备注
           </label>
           <textarea
             rows={2}

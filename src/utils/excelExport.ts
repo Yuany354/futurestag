@@ -11,6 +11,8 @@ export const exportEventsToExcel = (events: MacroEvent[]) => {
     '事件描述': e.description,
     '影响产业': e.impactedIndustries.map((ind) => ind.name).join('、'),
     '影响品种': e.marketVarieties.map((v) => `${v.name}(${v.code})`).join('、'),
+    '事件烈度（1～5）': e.eventIntensity ?? '',
+    '商品冲击程度（1～5）': e.commodityImpact ?? '',
     '备注': e.managerNotes || e.researcherNotes || '',
     '更新时间': e.updatedAt || '',
   }));
@@ -27,6 +29,8 @@ export const exportEventsToExcel = (events: MacroEvent[]) => {
     { wch: 45 }, // 事件描述
     { wch: 22 }, // 影响产业
     { wch: 25 }, // 影响品种
+    { wch: 16 }, // 事件烈度（1～5）
+    { wch: 18 }, // 商品冲击程度（1～5）
     { wch: 30 }, // 备注
     { wch: 18 }, // 更新时间
   ];

@@ -22,6 +22,8 @@ export interface MacroEvent {
   impactedIndustries: ImpactedIndustry[];
   marketVarieties: MarketVariety[];
   severity: 'low' | 'medium' | 'high' | 'critical';
+  eventIntensity?: number;     // 事件烈度，1～5分
+  commodityImpact?: number;    // 商品冲击程度，1～5分
   transmissionMechanism: string;
   managerNotes?: string;
   researcherNotes?: string;

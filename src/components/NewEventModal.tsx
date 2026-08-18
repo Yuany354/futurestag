@@ -21,6 +21,8 @@ export const NewEventModal: React.FC<NewEventModalProps> = ({
   );
   const [selectedCategory, setSelectedCategory] = useState(categories[0] || '金融风险与危机');
   const [description, setDescription] = useState('');
+  const [eventIntensity, setEventIntensity] = useState<number | undefined>(undefined);
+  const [commodityImpact, setCommodityImpact] = useState<number | undefined>(undefined);
 
   if (!isOpen) return null;
 
@@ -42,6 +44,8 @@ export const NewEventModal: React.FC<NewEventModalProps> = ({
         { name: '燃料油', code: 'FU', exchange: 'SHFE' },
       ],
       severity: 'medium',
+      eventIntensity,
+      commodityImpact,
       transmissionMechanism: '需求与供给变动 -> 预期转向 -> 资产重估',
       researcherName: '俞尘泯 (Researcher-YCM)',
       updatedAt: new Date().toLocaleString('zh-CN', { hour12: false }).slice(0, 16),
@@ -141,6 +145,41 @@ export const NewEventModal: React.FC<NewEventModalProps> = ({
               placeholder="概括该事件对宏观经济、供应链及核心大宗商品冲击的背景逻辑..."
               className="w-full p-2.5 text-xs border border-gray-300 rounded focus:ring-2 focus:ring-indigo-500 outline-none"
             />
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-semibold text-gray-700 mb-1">
+                事件烈度（1～5分）
+              </label>
+              <select
+                value={eventIntensity}
+                onChange={(e) => setEventIntensity(Number(e.target.value))}
+                className="w-full px-3 py-2 text-xs border border-gray-300 rounded bg-white focus:ring-2 focus:ring-indigo-500 outline-none"
+              >
+                {[1, 2, 3, 4, 5].map((n) => (
+                  <option key={n} value={n}>
+                    {n}分
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-gray-700 mb-1">
+                商品冲击程度（1～5分）
+              </label>
+              <select
+                value={commodityImpact}
+                onChange={(e) => setCommodityImpact(Number(e.target.value))}
+                className="w-full px-3 py-2 text-xs border border-gray-300 rounded bg-white focus:ring-2 focus:ring-indigo-500 outline-none"
+              >
+                {[1, 2, 3, 4, 5].map((n) => (
+                  <option key={n} value={n}>
+                    {n}分
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
 
           <div className="flex justify-end gap-2 pt-2 border-t border-gray-100">

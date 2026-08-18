@@ -165,6 +165,8 @@ export default function App() {
       impactedIndustries: [],
       marketVarieties: [],
       severity: 'medium',
+      eventIntensity: undefined,
+      commodityImpact: undefined,
       transmissionMechanism: '',
       managerNotes: '',
       researcherNotes: '',

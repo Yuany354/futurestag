@@ -68,8 +68,8 @@ export const PreviewModal: React.FC<PreviewModalProps> = ({ event, onClose }) =>
               <div className="text-gray-400">更新时间: {event.updatedAt}</div>
             </div>
 
-            {/* Category tags */}
-            <div className="mt-4 flex flex-wrap gap-2">
+            {/* Category tags & Scores */}
+            <div className="mt-4 flex flex-wrap gap-2 items-center">
               {event.categories.map((cat) => (
                 <span
                   key={cat}
@@ -78,6 +78,16 @@ export const PreviewModal: React.FC<PreviewModalProps> = ({ event, onClose }) =>
                   {cat}
                 </span>
               ))}
+              {event.eventIntensity != null && (
+                <span className="px-2.5 py-1 text-xs font-bold bg-amber-100 text-amber-800 border border-amber-300 rounded-full">
+                  事件烈度: {event.eventIntensity}
+                </span>
+              )}
+              {event.commodityImpact != null && (
+                <span className="px-2.5 py-1 text-xs font-bold bg-rose-100 text-rose-800 border border-rose-300 rounded-full">
+                  商品冲击程度: {event.commodityImpact}
+                </span>
+              )}
             </div>
           </div>
 

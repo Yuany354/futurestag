@@ -45,6 +45,8 @@ export const INITIAL_EVENTS: MacroEvent[] = [
       { name: '沪铜', code: 'CU', exchange: 'SHFE' }
     ],
     severity: 'critical',
+    eventIntensity: 5,
+    commodityImpact: 5,
     transmissionMechanism: '汇率中间价报价机制修正 -> 离岸贬值压力释放 -> 人民币计价大宗资产重估 -> 进口成本传导至产业链下游',
     researcherNotes: '重点关注离岸/在岸价差波动对贵金属进口套利逻辑的影响',
     researcherName: '俞尘泯',
@@ -68,6 +70,8 @@ export const INITIAL_EVENTS: MacroEvent[] = [
       { name: '棕榈油', code: 'P', exchange: 'DCE' }
     ],
     severity: 'critical',
+    eventIntensity: 5,
+    commodityImpact: 5,
     transmissionMechanism: '地缘冲突冲突加剧 -> 航运与出口封锁 -> 现货供给紧缩溢价飙升 -> 制造终端成本倒挂',
     researcherNotes: '俄乌局势下原油与欧洲天然气价格联动极强，重点监测原油与燃料油裂解价差',
     researcherName: '俞尘泯',
@@ -90,6 +94,8 @@ export const INITIAL_EVENTS: MacroEvent[] = [
       { name: '原油', code: 'SC', exchange: 'INE' }
     ],
     severity: 'critical',
+    eventIntensity: 5,
+    commodityImpact: 4,
     transmissionMechanism: '物流与开工受阻 -> 需求短期冰封 -> 资产流动性挤提 -> 美联储/全球央行降息开闸',
     researcherNotes: '极端冲击下金银比历史高位修复逻辑研究',
     researcherName: '俞尘泯',
@@ -111,6 +117,8 @@ export const INITIAL_EVENTS: MacroEvent[] = [
       { name: '螺纹钢', code: 'RB', exchange: 'SHFE' }
     ],
     severity: 'high',
+    eventIntensity: 4,
+    commodityImpact: 3,
     transmissionMechanism: '跨季资金紧俏 -> 拆借利率暴涨 -> 机构去杠杆被迫抛售 -> 资产价格无差别下杀',
     researcherNotes: '流动性危机时期信用债与高Beta品种折价最大',
     researcherName: '俞尘泯',
