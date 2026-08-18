@@ -154,8 +154,28 @@ export const EventMainView: React.FC<EventMainViewProps> = ({
                     <th className="py-3.5 px-4 font-bold">受影响产业</th>
                     <th className="py-3.5 px-4 font-bold">核心交易品种</th>
                     <th className="py-3.5 px-4 font-bold max-w-xs">事件简述</th>
-                    <th className="py-3.5 px-4 font-bold text-center w-24">事件烈度</th>
-                    <th className="py-3.5 px-4 font-bold text-center w-28 whitespace-nowrap">商品冲击程度</th>
+                    <th className="py-3.5 px-4 font-bold text-center w-24">
+                      <span className="group relative inline-flex items-center justify-center gap-1">
+                        事件烈度
+                        <span className="relative inline-flex items-center justify-center w-4 h-4 bg-gray-200 hover:bg-gray-300 text-gray-500 hover:text-gray-700 rounded-full cursor-help transition-colors text-[10px] font-bold">?</span>
+                        <span className="absolute top-full left-1/2 -translate-x-1/2 mt-2 hidden group-hover:block z-50 w-72 p-3 bg-gray-900 text-white text-[11px] leading-relaxed rounded-lg shadow-xl border border-gray-700 pointer-events-none whitespace-normal">
+                          <span className="font-bold text-amber-300">事件本身的宏观冲击力</span>，包括系统性与持续时间。<br/>
+                          1=极低，2=低，3=中，4=高，5=极高
+                          <span className="absolute -top-2 left-1/2 -translate-x-1/2 border-4 border-transparent border-b-gray-900"></span>
+                        </span>
+                      </span>
+                    </th>
+                    <th className="py-3.5 px-4 font-bold text-center w-28 whitespace-nowrap">
+                      <span className="group relative inline-flex items-center justify-center gap-1">
+                        商品冲击程度
+                        <span className="relative inline-flex items-center justify-center w-4 h-4 bg-gray-200 hover:bg-gray-300 text-gray-500 hover:text-gray-700 rounded-full cursor-help transition-colors text-[10px] font-bold">?</span>
+                        <span className="absolute top-full left-1/2 -translate-x-1/2 mt-2 hidden group-hover:block z-50 w-72 p-3 bg-gray-900 text-white text-[11px] leading-relaxed rounded-lg shadow-xl border border-gray-700 pointer-events-none whitespace-normal">
+                          事件对国内已上市商品品种价格的冲击<br/><span className="font-bold text-rose-300">（幅度 × 广度 × 持续性）</span><br/>
+                          1=极弱，2=弱，3=中，4=强，5=极强
+                          <span className="absolute -top-2 left-1/2 -translate-x-1/2 border-4 border-transparent border-b-gray-900"></span>
+                        </span>
+                      </span>
+                    </th>
                     <th className="py-3.5 px-4 font-bold text-right w-44 whitespace-nowrap">操作</th>
                   </tr>
                 </thead>
