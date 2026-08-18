@@ -49,8 +49,12 @@ export default function App() {
   
   // Drawer & Modal Visibility States
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
+  // Filters
   const [selectedCategoryFilter, setSelectedCategoryFilter] = useState<string | null>(null);
+  const [selectedIndustryFilter, setSelectedIndustryFilter] = useState<string | null>(null);
+  const [selectedVarietyFilter, setSelectedVarietyFilter] = useState<string | null>(null);
+  const [selectedIntensityFilter, setSelectedIntensityFilter] = useState<number | null>(null);
+  const [selectedImpactFilter, setSelectedImpactFilter] = useState<number | null>(null);
 
   // Modals
   const [isAddCategoryOpen, setIsAddCategoryOpen] = useState(false);
@@ -260,10 +264,16 @@ export default function App() {
                 onExportExcel={handleExportExcel}
                 onPreviewEvent={handlePreviewEvent}
                 onRequestDelete={(id, title) => setDeletingTarget({ id, title })}
-                searchQuery={searchQuery}
-                onSearchChange={setSearchQuery}
                 selectedCategoryFilter={selectedCategoryFilter}
                 onSelectCategoryFilter={setSelectedCategoryFilter}
+                selectedIndustryFilter={selectedIndustryFilter}
+                onSelectIndustryFilter={setSelectedIndustryFilter}
+                selectedVarietyFilter={selectedVarietyFilter}
+                onSelectVarietyFilter={setSelectedVarietyFilter}
+                selectedIntensityFilter={selectedIntensityFilter}
+                onSelectIntensityFilter={setSelectedIntensityFilter}
+                selectedImpactFilter={selectedImpactFilter}
+                onSelectImpactFilter={setSelectedImpactFilter}
                 categories={categories}
               />
             ) : (

@@ -1,7 +1,7 @@
 import React from 'react';
 import { MacroEvent } from '../types';
 import { getIndustryColor, INDUSTRY_COLOR_BADGES } from '../utils/industryColors';
-import { Search, Plus, Download, Calendar, Eye, Edit3, Sparkles, Filter, ChevronRight, Check, Trash2 } from 'lucide-react';
+import { Plus, Download, Calendar, Eye, Edit3, Sparkles, ChevronRight, Check, Trash2 } from 'lucide-react';
 
 interface EventMainViewProps {
   events: MacroEvent[];
@@ -11,10 +11,16 @@ interface EventMainViewProps {
   onExportExcel: () => void;
   onPreviewEvent: (evt: MacroEvent) => void;
   onRequestDelete: (id: string, title: string) => void;
-  searchQuery: string;
-  onSearchChange: (q: string) => void;
   selectedCategoryFilter: string | null;
   onSelectCategoryFilter: (cat: string | null) => void;
+  selectedIndustryFilter: string | null;
+  onSelectIndustryFilter: (ind: string | null) => void;
+  selectedVarietyFilter: string | null;
+  onSelectVarietyFilter: (varCode: string | null) => void;
+  selectedIntensityFilter: number | null;
+  onSelectIntensityFilter: (val: number | null) => void;
+  selectedImpactFilter: number | null;
+  onSelectImpactFilter: (val: number | null) => void;
   categories: string[];
 }
 
@@ -26,28 +32,37 @@ export const EventMainView: React.FC<EventMainViewProps> = ({
   onExportExcel,
   onPreviewEvent,
   onRequestDelete,
-  searchQuery,
-  onSearchChange,
   selectedCategoryFilter,
   onSelectCategoryFilter,
+  selectedIndustryFilter,
+  onSelectIndustryFilter,
+  selectedVarietyFilter,
+  onSelectVarietyFilter,
+  selectedIntensityFilter,
+  onSelectIntensityFilter,
+  selectedImpactFilter,
+  onSelectImpactFilter,
   categories,
 }) => {
-  // Filter events based on search query & category filter
+  // Collect unique industries and varieties from all events for filter dropdowns
+  const allIndustries = Array.from(new Set(events.flatMap((e) => e.impactedIndustries.map((i) => i.name)))).sort();
+  // Unique varieties by code, keeping name for display
+  const allVarietiesMap: Record<string, string> = {};
+  events.forEach((e) => e.marketVarieties.forEach((v) => { allVarietiesMap[v.code] = v.name; }));
+  const allVarieties = Object.entries(allVarietiesMap).sort((a, b) => a[0].localeCompare(b[0]));
+
+  // Filter events based on all filter criteria
   const filteredEvents = events.filter((evt) => {
-    const matchesQuery =
-      evt.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      evt.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      evt.marketVarieties.some(
-        (v) =>
-          v.name.includes(searchQuery) ||
-          v.code.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-
-    const matchesCategory =
-      !selectedCategoryFilter || evt.categories.includes(selectedCategoryFilter);
-
-    return matchesQuery && matchesCategory;
+    const matchesCategory = !selectedCategoryFilter || evt.categories.includes(selectedCategoryFilter);
+    const matchesIndustry = !selectedIndustryFilter || evt.impactedIndustries.some((i) => i.name === selectedIndustryFilter);
+    const matchesVariety = !selectedVarietyFilter || evt.marketVarieties.some((v) => v.code === selectedVarietyFilter);
+    const matchesIntensity = selectedIntensityFilter == null || evt.eventIntensity === selectedIntensityFilter;
+    const matchesImpact = selectedImpactFilter == null || evt.commodityImpact === selectedImpactFilter;
+    return matchesCategory && matchesIndustry && matchesVariety && matchesIntensity && matchesImpact;
   });
+
+  // Check if any filter is active
+  const hasActiveFilter = selectedCategoryFilter || selectedIndustryFilter || selectedVarietyFilter || selectedIntensityFilter != null || selectedImpactFilter != null;
 
   return (
     <div className="flex-1 flex flex-col h-full bg-[#F8FAFC] overflow-hidden">
@@ -85,53 +100,88 @@ export const EventMainView: React.FC<EventMainViewProps> = ({
           </div>
         </div>
 
-        {/* Search Input & Category Filters */}
-        <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
-          {/* Search Box */}
-          <div className="relative flex-1 min-w-[280px] max-w-md">
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => onSearchChange(e.target.value)}
-              placeholder="搜索事件名称、受影响产业、品种代码..."
-              className="w-full pl-9 pr-4 py-2 text-xs border border-slate-200 rounded-lg bg-slate-50/60 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 text-slate-800 placeholder-slate-400 transition-all"
-            />
-            <Search className="w-4 h-4 absolute left-3 top-2.5 text-slate-400" />
+        {/* Filter Row */}
+        <div className="flex flex-wrap items-center gap-4 pt-1">
+          {/* 事件标签 */}
+          <div className="flex items-center gap-2">
+            <span className="text-[11px] text-slate-500 font-bold shrink-0">事件标签</span>
+            <select
+              value={selectedCategoryFilter ?? ''}
+              onChange={(e) => onSelectCategoryFilter(e.target.value || null)}
+              className="px-2 py-1.5 text-xs border border-slate-200 rounded bg-white text-slate-700 focus:outline-none focus:ring-1 focus:ring-indigo-400 cursor-pointer"
+            >
+              <option value="">全部</option>
+              {categories.map((c) => <option key={c} value={c}>{c}</option>)}
+            </select>
           </div>
 
-          {/* Category Quick Filter Pills */}
-          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5 text-xs">
-            <span className="text-[11px] text-slate-400 font-medium shrink-0 flex items-center gap-1 mr-1">
-              <Filter className="w-3 h-3" />
-              分类:
-            </span>
-            <button
-              onClick={() => onSelectCategoryFilter(null)}
-              className={`px-3 py-1 rounded-md border text-xs whitespace-nowrap transition-all cursor-pointer ${
-                selectedCategoryFilter === null
-                  ? 'bg-slate-900 text-white border-slate-900 font-bold shadow-2xs'
-                  : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-100'
-              }`}
+          {/* 受影响产业 */}
+          <div className="flex items-center gap-2">
+            <span className="text-[11px] text-slate-500 font-bold shrink-0">受影响产业</span>
+            <select
+              value={selectedIndustryFilter ?? ''}
+              onChange={(e) => onSelectIndustryFilter(e.target.value || null)}
+              className="px-2 py-1.5 text-xs border border-slate-200 rounded bg-white text-slate-700 focus:outline-none focus:ring-1 focus:ring-indigo-400 cursor-pointer"
             >
-              全部
-            </button>
-            {categories.map((cat) => {
-              const isSelected = selectedCategoryFilter === cat;
-              return (
-                <button
-                  key={cat}
-                  onClick={() => onSelectCategoryFilter(isSelected ? null : cat)}
-                  className={`px-3 py-1 rounded-md border text-xs whitespace-nowrap transition-all cursor-pointer ${
-                    isSelected
-                      ? 'bg-indigo-600 text-white border-indigo-600 font-bold shadow-2xs'
-                      : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-100'
-                  }`}
-                >
-                  {cat}
-                </button>
-              );
-            })}
+              <option value="">全部</option>
+              {allIndustries.map((i) => <option key={i} value={i}>{i}</option>)}
+            </select>
           </div>
+
+          {/* 核心影响品种 */}
+          <div className="flex items-center gap-2">
+            <span className="text-[11px] text-slate-500 font-bold shrink-0">核心影响品种</span>
+            <select
+              value={selectedVarietyFilter ?? ''}
+              onChange={(e) => onSelectVarietyFilter(e.target.value || null)}
+              className="px-2 py-1.5 text-xs border border-slate-200 rounded bg-white text-slate-700 focus:outline-none focus:ring-1 focus:ring-indigo-400 cursor-pointer"
+            >
+              <option value="">全部</option>
+              {allVarieties.map(([code, name]) => <option key={code} value={code}>{name}（{code}）</option>)}
+            </select>
+          </div>
+
+          {/* 事件烈度 */}
+          <div className="flex items-center gap-2">
+            <span className="text-[11px] text-slate-500 font-bold shrink-0">事件烈度</span>
+            <select
+              value={selectedIntensityFilter ?? ''}
+              onChange={(e) => onSelectIntensityFilter(e.target.value ? Number(e.target.value) : null)}
+              className="px-2 py-1.5 text-xs border border-slate-200 rounded bg-white text-slate-700 focus:outline-none focus:ring-1 focus:ring-indigo-400 cursor-pointer"
+            >
+              <option value="">全部</option>
+              {[1, 2, 3, 4, 5].map((n) => <option key={n} value={n}>{n}</option>)}
+            </select>
+          </div>
+
+          {/* 商品冲击程度 */}
+          <div className="flex items-center gap-2">
+            <span className="text-[11px] text-slate-500 font-bold shrink-0">商品冲击程度</span>
+            <select
+              value={selectedImpactFilter ?? ''}
+              onChange={(e) => onSelectImpactFilter(e.target.value ? Number(e.target.value) : null)}
+              className="px-2 py-1.5 text-xs border border-slate-200 rounded bg-white text-slate-700 focus:outline-none focus:ring-1 focus:ring-indigo-400 cursor-pointer"
+            >
+              <option value="">全部</option>
+              {[1, 2, 3, 4, 5].map((n) => <option key={n} value={n}>{n}</option>)}
+            </select>
+          </div>
+
+          {/* 清除筛选 */}
+          {hasActiveFilter && (
+            <button
+              onClick={() => {
+                onSelectCategoryFilter(null);
+                onSelectIndustryFilter(null);
+                onSelectVarietyFilter(null);
+                onSelectIntensityFilter(null);
+                onSelectImpactFilter(null);
+              }}
+              className="px-2.5 py-1.5 text-xs text-rose-600 hover:text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200 rounded transition-colors cursor-pointer font-medium"
+            >
+              清除筛选
+            </button>
+          )}
         </div>
       </div>
 
@@ -152,7 +202,7 @@ export const EventMainView: React.FC<EventMainViewProps> = ({
                     <th className="py-3.5 px-4 font-bold">事件名称 & 分类</th>
                     <th className="py-3.5 px-4 font-bold w-32 whitespace-nowrap">起始日期</th>
                     <th className="py-3.5 px-4 font-bold">受影响产业</th>
-                    <th className="py-3.5 px-4 font-bold">核心交易品种</th>
+                    <th className="py-3.5 px-4 font-bold">核心影响品种</th>
                     <th className="py-3.5 px-4 font-bold max-w-xs">事件简述</th>
                     <th className="py-3.5 px-4 font-bold text-center w-24">
                       <span className="group relative inline-flex items-center justify-center gap-1">
