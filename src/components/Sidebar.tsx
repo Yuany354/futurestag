@@ -1,7 +1,7 @@
 import React from 'react';
-import { Zap, FileText, Calendar, ShieldAlert, Sparkles } from 'lucide-react';
+import { Zap, FileText, Calendar, ShieldAlert, Sparkles, Gauge } from 'lucide-react';
 
-export type ResearchSubMenu = 'flash_news' | 'research_report' | 'calendar' | 'macro_events';
+export type ResearchSubMenu = 'flash_news' | 'research_report' | 'calendar' | 'macro_events' | 'impact_matrix';
 
 interface SidebarProps {
   activeSubMenu: ResearchSubMenu;
@@ -27,6 +27,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
       id: 'macro_events',
       label: '重大事件',
       icon: <ShieldAlert className="w-4 h-4" />,
+    },
+    {
+      id: 'impact_matrix',
+      label: '冲击评分矩阵',
+      icon: <Gauge className="w-4 h-4" />,
     },
   ];
 

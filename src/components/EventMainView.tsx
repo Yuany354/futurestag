@@ -3,6 +3,9 @@ import { MacroEvent } from '../types';
 import { getIndustryColor, INDUSTRY_COLOR_BADGES } from '../utils/industryColors';
 import { Plus, Download, Calendar, Eye, Edit3, Sparkles, ChevronRight, Check, Trash2 } from 'lucide-react';
 
+// 列表单元格中产业/品种最多展示数量，超出部分折叠为 +N
+const MAX_VISIBLE_TAGS = 4;
+
 interface EventMainViewProps {
   events: MacroEvent[];
   activeEventId: string;
@@ -272,18 +275,28 @@ export const EventMainView: React.FC<EventMainViewProps> = ({
                             {evt.impactedIndustries.length === 0 ? (
                               <span className="text-slate-400 italic">暂无</span>
                             ) : (
-                              evt.impactedIndustries.map((ind) => {
-                                const colorStyle = getIndustryColor(ind.name, ind.colorStyle);
-                                const badgeClass = INDUSTRY_COLOR_BADGES[colorStyle];
-                                return (
+                              <>
+                                {evt.impactedIndustries.slice(0, MAX_VISIBLE_TAGS).map((ind) => {
+                                  const colorStyle = getIndustryColor(ind.name, ind.colorStyle);
+                                  const badgeClass = INDUSTRY_COLOR_BADGES[colorStyle];
+                                  return (
+                                    <span
+                                      key={ind.id}
+                                      className={`px-2 py-0.5 text-[10px] font-semibold border rounded ${badgeClass}`}
+                                    >
+                                      {ind.name}
+                                    </span>
+                                  );
+                                })}
+                                {evt.impactedIndustries.length > MAX_VISIBLE_TAGS && (
                                   <span
-                                    key={ind.id}
-                                    className={`px-2 py-0.5 text-[10px] font-semibold border rounded ${badgeClass}`}
+                                    className="px-2 py-0.5 text-[10px] font-semibold border rounded bg-slate-50 text-slate-500 border-slate-200 cursor-help"
+                                    title={evt.impactedIndustries.slice(MAX_VISIBLE_TAGS).map((i) => i.name).join('、')}
                                   >
-                                    {ind.name}
+                                    +{evt.impactedIndustries.length - MAX_VISIBLE_TAGS}
                                   </span>
-                                );
-                              })
+                                )}
+                              </>
                             )}
                           </div>
                         </td>
@@ -294,15 +307,25 @@ export const EventMainView: React.FC<EventMainViewProps> = ({
                             {evt.marketVarieties.length === 0 ? (
                               <span className="text-slate-400 italic">暂无</span>
                             ) : (
-                              evt.marketVarieties.map((v) => (
-                                <span
-                                  key={v.code}
-                                  className="px-1.5 py-0.5 bg-slate-100 text-slate-800 border border-slate-200 text-[10px] rounded font-medium inline-flex items-center gap-1"
-                                >
-                                  <span>{v.name}</span>
-                                  <code className="text-slate-500 font-mono text-[9px]">{v.code}</code>
-                                </span>
-                              ))
+                              <>
+                                {evt.marketVarieties.slice(0, MAX_VISIBLE_TAGS).map((v) => (
+                                  <span
+                                    key={v.code}
+                                    className="px-1.5 py-0.5 bg-slate-100 text-slate-800 border border-slate-200 text-[10px] rounded font-medium inline-flex items-center gap-1"
+                                  >
+                                    <span>{v.name}</span>
+                                    <code className="text-slate-500 font-mono text-[9px]">{v.code}</code>
+                                  </span>
+                                ))}
+                                {evt.marketVarieties.length > MAX_VISIBLE_TAGS && (
+                                  <span
+                                    className="px-1.5 py-0.5 bg-slate-100 text-slate-500 border border-slate-200 text-[10px] rounded font-medium cursor-help"
+                                    title={evt.marketVarieties.slice(MAX_VISIBLE_TAGS).map((v) => `${v.name}(${v.code})`).join('、')}
+                                  >
+                                    +{evt.marketVarieties.length - MAX_VISIBLE_TAGS}
+                                  </span>
+                                )}
+                              </>
                             )}
                           </div>
                         </td>

@@ -47,6 +47,14 @@ export const EventForm: React.FC<EventFormProps> = ({
     onChange({ ...event, marketVarieties: updated });
   };
 
+  // Update per-variety commodity impact score
+  const handleVarietyScoreChange = (code: string, score: number | undefined) => {
+    const updated = event.marketVarieties.map((v) =>
+      v.code === code ? { ...v, impactScore: score } : v
+    );
+    onChange({ ...event, marketVarieties: updated });
+  };
+
   // Handle native date picker selection
   const handleNativeDateSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.value) {
@@ -222,6 +230,7 @@ export const EventForm: React.FC<EventFormProps> = ({
               <label className="block text-[11px] font-bold text-gray-500 uppercase tracking-wider">
                 6. 影响品种
               </label>
+              <span className="text-[10px] text-gray-400">各品种可单独评定商品冲击程度</span>
             </div>
             <div className="p-4 bg-white border border-gray-200 rounded-lg min-h-[90px] flex items-center shadow-2xs">
               <div className="flex flex-wrap gap-2 items-center w-full">
@@ -237,6 +246,22 @@ export const EventForm: React.FC<EventFormProps> = ({
                       <code className="text-gray-600 font-mono text-[11px] bg-white px-1.5 py-0.5 rounded border border-gray-200 font-semibold">
                         {varItem.code}
                       </code>
+                      <select
+                        value={varItem.impactScore ?? event.commodityImpact ?? 0}
+                        onChange={(e) =>
+                          handleVarietyScoreChange(
+                            varItem.code,
+                            e.target.value ? Number(e.target.value) : undefined
+                          )
+                        }
+                        onClick={(e) => e.stopPropagation()}
+                        className="px-1 py-0.5 text-[11px] bg-white border border-rose-200 text-rose-700 rounded font-semibold focus:ring-1 focus:ring-rose-400 outline-none cursor-pointer"
+                        title="该品种的商品冲击程度（0～5）"
+                      >
+                        {[0, 1, 2, 3, 4, 5].map((n) => (
+                          <option key={n} value={n}>{n}分</option>
+                        ))}
+                      </select>
                       <button
                         type="button"
                         onClick={() => handleRemoveVariety(varItem.code)}
@@ -307,6 +332,9 @@ export const EventForm: React.FC<EventFormProps> = ({
               </option>
             ))}
           </select>
+          <p className="mt-1.5 text-[11px] text-gray-400">
+            作为事件级统一评分；上方「影响品种」中可按品种单独调整，未单独设置的品种将沿用此分数。
+          </p>
         </div>
 
         {/* 9. 备注 */}

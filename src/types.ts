@@ -11,6 +11,7 @@ export interface MarketVariety {
   code: string;
   exchange?: string;
   category?: string;
+  impactScore?: number;  // 该品种在本事件下的商品冲击程度（1～5），未设置时沿用事件级评分
 }
 
 export interface MacroEvent {

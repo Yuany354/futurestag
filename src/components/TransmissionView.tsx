@@ -84,20 +84,33 @@ export const TransmissionView: React.FC<TransmissionViewProps> = ({ event }) => 
           </div>
 
           <div className="grid grid-cols-2 gap-2">
-            {event.marketVarieties.map((varItem) => (
-              <div
-                key={varItem.code}
-                className="p-3 bg-gray-50 border border-gray-200 rounded-md flex items-center justify-between hover:border-indigo-400 transition-colors"
-              >
-                <div>
-                  <div className="text-xs font-bold text-gray-900">{varItem.name}</div>
-                  <div className="text-[10px] text-gray-400 font-mono">{varItem.exchange || 'SHFE'}</div>
+            {event.marketVarieties.map((varItem) => {
+              const effectiveScore = varItem.impactScore ?? event.commodityImpact;
+              return (
+                <div
+                  key={varItem.code}
+                  className="p-3 bg-gray-50 border border-gray-200 rounded-md flex items-center justify-between hover:border-indigo-400 transition-colors"
+                >
+                  <div>
+                    <div className="text-xs font-bold text-gray-900">{varItem.name}</div>
+                    <div className="text-[10px] text-gray-400 font-mono">{varItem.exchange || 'SHFE'}</div>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    {effectiveScore != null && (
+                      <span
+                        className="text-[10px] font-bold bg-rose-100 text-rose-800 border border-rose-300 rounded px-1 py-0.5 leading-none"
+                        title={`商品冲击程度${varItem.impactScore == null ? '（沿用事件级评分）' : '（品种单独评分）'}`}
+                      >
+                        {effectiveScore}分
+                      </span>
+                    )}
+                    <code className="text-xs font-mono font-bold text-indigo-600 bg-white px-1.5 py-0.5 rounded border border-indigo-100">
+                      {varItem.code}
+                    </code>
+                  </div>
                 </div>
-                <code className="text-xs font-mono font-bold text-indigo-600 bg-white px-1.5 py-0.5 rounded border border-indigo-100">
-                  {varItem.code}
-                </code>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </div>

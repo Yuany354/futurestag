@@ -27,6 +27,7 @@ const INDUSTRY_PRESET_COLORS: Record<string, IndustryColor> = {
   '橡胶': 'rose',
   '煤炭': 'gray',
   '黑色建材': 'gray',
+  '黑色金属': 'gray',
   '建材': 'gray',
   '权益股指': 'purple',
 };

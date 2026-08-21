@@ -4,6 +4,7 @@ import { INITIAL_EVENTS, INITIAL_CATEGORIES } from './data/mockEvents';
 import { PlatformHeader, PlatformTab } from './components/PlatformHeader';
 import { Sidebar, ResearchSubMenu } from './components/Sidebar';
 import { EventMainView } from './components/EventMainView';
+import { ImpactMatrixView } from './components/ImpactMatrixView';
 import { EventDrawer } from './components/EventDrawer';
 import { PreviewModal } from './components/PreviewModal';
 import { AddCategoryModal } from './components/AddCategoryModal';
@@ -13,6 +14,10 @@ import { ConfirmDeleteModal } from './components/ConfirmDeleteModal';
 import { exportEventsToExcel } from './utils/excelExport';
 import { Check, ShieldAlert, Database, BarChart3, ArrowRight, Zap, FileText, Calendar } from 'lucide-react';
 
+// 数据版本：升级到 v2 后，旧版预置假事件的本地缓存将被表格维护的真实事件替换
+const STORAGE_KEY_EVENTS = 'ycm_macro_events_v2';
+const STORAGE_KEY_CATEGORIES = 'ycm_macro_categories';
+
 export default function App() {
   // Navigation State
   const [platformTab, setPlatformTab] = useState<PlatformTab>('research_info');
@@ -20,7 +25,7 @@ export default function App() {
 
   // Persistence in localStorage
   const [events, setEvents] = useState<MacroEvent[]>(() => {
-    const saved = localStorage.getItem('ycm_macro_events');
+    const saved = localStorage.getItem(STORAGE_KEY_EVENTS);
     if (saved) {
       try {
         return JSON.parse(saved);
@@ -32,7 +37,7 @@ export default function App() {
   });
 
   const [categories, setCategories] = useState<string[]>(() => {
-    const saved = localStorage.getItem('ycm_macro_categories');
+    const saved = localStorage.getItem(STORAGE_KEY_CATEGORIES);
     if (saved) {
       try {
         return JSON.parse(saved);
@@ -70,11 +75,11 @@ export default function App() {
 
   // Save to localStorage whenever events or categories change
   useEffect(() => {
-    localStorage.setItem('ycm_macro_events', JSON.stringify(events));
+    localStorage.setItem(STORAGE_KEY_EVENTS, JSON.stringify(events));
   }, [events]);
 
   useEffect(() => {
-    localStorage.setItem('ycm_macro_categories', JSON.stringify(categories));
+    localStorage.setItem(STORAGE_KEY_CATEGORIES, JSON.stringify(categories));
   }, [categories]);
 
   // Data Sanitization Effect: Automatically sanitize any stale '疫情与卫生' to '公共卫生'
@@ -139,14 +144,37 @@ export default function App() {
   };
 
   // Add market varieties (supports batch add)
+  // 新增品种默认沿用事件级商品冲击程度，后续可按品种单独修改
   const handleAddVariety = (varieties: MarketVariety | MarketVariety[]) => {
     if (activeEvent) {
       const toAdd = Array.isArray(varieties) ? varieties : [varieties];
+      const withDefaultScore = toAdd.map((v) => ({
+        ...v,
+        impactScore: v.impactScore ?? activeEvent.commodityImpact,
+      }));
       handleUpdateActiveEvent({
         ...activeEvent,
-        marketVarieties: [...activeEvent.marketVarieties, ...toAdd],
+        marketVarieties: [...activeEvent.marketVarieties, ...withDefaultScore],
       });
     }
+  };
+
+  // Update a single variety's commodity impact score within an event
+  const handleUpdateVarietyImpact = (
+    eventId: string,
+    varietyCode: string,
+    score: number | undefined
+  ) => {
+    const newEvents = events.map((evt) => {
+      if (evt.id !== eventId) return evt;
+      return {
+        ...evt,
+        marketVarieties: evt.marketVarieties.map((v) =>
+          v.code === varietyCode ? { ...v, impactScore: score } : v
+        ),
+      };
+    });
+    setEvents(newEvents);
   };
 
   // Select Event from Main List
@@ -195,8 +223,8 @@ export default function App() {
 
   // Manual Save Config Action
   const handleSaveConfig = () => {
-    localStorage.setItem('ycm_macro_events', JSON.stringify(events));
-    localStorage.setItem('ycm_macro_categories', JSON.stringify(categories));
+    localStorage.setItem(STORAGE_KEY_EVENTS, JSON.stringify(events));
+    localStorage.setItem(STORAGE_KEY_CATEGORIES, JSON.stringify(categories));
     setIsSavedJustNow(true);
     setToastText('成功保存！');
 
@@ -218,7 +246,7 @@ export default function App() {
     const { id, title } = deletingTarget;
     const updatedEvents = events.filter((e) => e.id !== id);
     setEvents(updatedEvents);
-    localStorage.setItem('ycm_macro_events', JSON.stringify(updatedEvents));
+    localStorage.setItem(STORAGE_KEY_EVENTS, JSON.stringify(updatedEvents));
 
     if (activeEventId === id) {
       if (updatedEvents.length > 0) {
@@ -275,6 +303,13 @@ export default function App() {
                 selectedImpactFilter={selectedImpactFilter}
                 onSelectImpactFilter={setSelectedImpactFilter}
                 categories={categories}
+              />
+            ) : researchSubMenu === 'impact_matrix' ? (
+              /* Per-Variety Commodity Impact Scoring Matrix */
+              <ImpactMatrixView
+                events={events}
+                onChangeVarietyImpact={handleUpdateVarietyImpact}
+                onSelectEvent={handleSelectEvent}
               />
             ) : (
               /* Sub-menu placeholder view for 快讯, 研报, 财经日历 */

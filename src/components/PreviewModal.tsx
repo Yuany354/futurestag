@@ -15,7 +15,9 @@ export const PreviewModal: React.FC<PreviewModalProps> = ({ event, onClose }) =>
     const text = `【重大事件定义】${event.title} (${event.startDate})
 分类: ${event.categories.join(' / ')}
 影响产业: ${event.impactedIndustries.map((i) => i.name).join('、')}
-品种: ${event.marketVarieties.map((v) => `${v.name}(${v.code})`).join('、')}
+品种: ${event.marketVarieties
+      .map((v) => `${v.name}(${v.code}) ${v.impactScore ?? event.commodityImpact ?? '-'}分`)
+      .join('、')}
 事件摘要: ${event.description}`;
 
     navigator.clipboard.writeText(text);
@@ -137,17 +139,28 @@ export const PreviewModal: React.FC<PreviewModalProps> = ({ event, onClose }) =>
                 {event.marketVarieties.length === 0 ? (
                   <span className="text-xs text-gray-400">无</span>
                 ) : (
-                  event.marketVarieties.map((varItem) => (
-                    <div
-                      key={varItem.code}
-                      className="flex items-center gap-1.5 px-2 py-1 bg-gray-50 border border-gray-300 rounded text-xs"
-                    >
-                      <span className="font-bold text-gray-900">{varItem.name}</span>
-                      <code className="text-gray-600 font-mono text-[11px] bg-white px-1 rounded border border-gray-200 font-semibold">
-                        {varItem.code}
-                      </code>
-                    </div>
-                  ))
+                  event.marketVarieties.map((varItem) => {
+                    const effectiveScore = varItem.impactScore ?? event.commodityImpact;
+                    return (
+                      <div
+                        key={varItem.code}
+                        className="flex items-center gap-1.5 px-2 py-1 bg-gray-50 border border-gray-300 rounded text-xs"
+                      >
+                        <span className="font-bold text-gray-900">{varItem.name}</span>
+                        <code className="text-gray-600 font-mono text-[11px] bg-white px-1 rounded border border-gray-200 font-semibold">
+                          {varItem.code}
+                        </code>
+                        {effectiveScore != null && (
+                          <span
+                            className="text-[10px] font-bold bg-rose-100 text-rose-800 border border-rose-300 rounded px-1 py-0.5 leading-none"
+                            title={`商品冲击程度${varItem.impactScore == null ? '（沿用事件级评分）' : '（品种单独评分）'}`}
+                          >
+                            {effectiveScore}分
+                          </span>
+                        )}
+                      </div>
+                    );
+                  })
                 )}
               </div>
             </div>
